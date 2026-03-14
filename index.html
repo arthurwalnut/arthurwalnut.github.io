@@ -4,24 +4,36 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Homepage</title>
+  <link rel="icon" type="image/png" href="assets/img/profile_pic_animate.png" />
+  <link rel="apple-touch-icon" href="assets/img/profile_pic_animate.png" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="header-content">
-      <h1>Xujie Zhao</h1>
-      <p>Undergraduate Student · Research Interests: Computer Vision, Brain-Computer Interface (BCI)</p>
-      <nav class="nav">
-        <a href="#about">About</a>
-        <a href="#pubs">Publications</a>
-        <a href="#work">Work Experience</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
+  <header class="top-nav-bar">
+    <nav class="top-nav" aria-label="Primary">
+      <a href="#about">About Me</a>
+      <a href="#educations">Educations</a>
+      <a href="#pubs">Publications</a>
+      <a href="#work">Work Experience</a>
+    </nav>
+  </header>
+
+  <aside class="sidebar">
     <div class="profile-pic-wrap">
       <img class="profile-pic" src="assets/img/profile_pic_animate.png" alt="Profile photo of Xujie Zhao" />
     </div>
-  </header>
+    <h1 class="profile-name">Xujie Zhao</h1>
+    <p class="profile-affiliation">Technical University of Munich</p>
+
+    <section class="contact-block" aria-label="Contact">
+      <ul>
+        <li>Email: xujie.zhao(at)tum.de</li>
+        <li><a href="https://github.com/arthurwalnut">GitHub</a></li>
+        <li><a href="https://scholar.google.com/citations?user=ri1VqO8AAAAJ">Google Scholar</a></li>
+        <li><a href="https://orcid.org/0009-0003-3297-5734">ORCID</a></li>
+      </ul>
+    </section>
+  </aside>
 
   <main class="container">
     <section id="about">
@@ -29,10 +41,17 @@
       <p>I am...</p>
     </section>
 
+    <section id="educations">
+      <h2>Educations</h2>
+      <ul>
+        <li><strong>B.Sc. Student</strong>, Technical University of Munich</li>
+      </ul>
+    </section>
+
     <section id="pubs">
       <h2>Publications</h2>
       <ul>
-        
+
         <li class="publication-item">
           <div class="publication-title">
             Robust Multi-contrast MRI Medical Image Translation via Knowledge Distillation and Adversarial Attack
@@ -106,16 +125,6 @@
           - Created original handouts and slides<br>
           - Proctored and graded final and resit examinations<br>
         </li>
-      </ul>
-    </section>
-
-    <section id="contact">
-      <h2>Contact</h2>
-      <ul>
-        <li>Email: xujie.zhao(at)tum.de</li>
-        <li><a href="https://github.com/arthurwalnut">GitHub</a></li>
-        <li><a href="https://scholar.google.com/citations?user=ri1VqO8AAAAJ">Google Scholar</a></li>
-        <li><a href="https://orcid.org/0009-0003-3297-5734">ORCID</a></li>
       </ul>
     </section>
   </main>
