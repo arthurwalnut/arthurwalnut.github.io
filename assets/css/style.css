@@ -3,7 +3,7 @@
   --sidebar-width: 280px;
   --content-width: 920px;
   --layout-width: calc(var(--sidebar-width) + var(--content-width));
-  --anchor-offset: 36px;
+  --anchor-offset: 40px;
 }
 
 * {
