@@ -126,7 +126,51 @@ main ul {
     --sidebar-width: 240px;
     --content-width: 700px;
   }
+
+  .top-nav {
+    gap: 28px;
+  }
+
   .container {
     padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --topbar-height: auto;
+  }
+
+  .top-nav-bar {
+    position: sticky;
+    left: 0;
+    transform: none;
+    width: 100%;
+    min-height: 60px;
+    padding: 10px 12px;
+  }
+
+  .top-nav {
+    gap: 16px;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    padding: 18px 16px;
+  }
+
+  .container {
+    margin-top: 0;
+    margin-left: 0;
+    max-width: 100%;
+    padding: 18px 16px 24px;
+  }
+
+  section {
+    scroll-margin-top: 72px;
   }
 }
