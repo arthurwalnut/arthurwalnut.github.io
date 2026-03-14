@@ -3,7 +3,7 @@
   --sidebar-width: 280px;
   --content-width: 920px;
   --layout-width: calc(var(--sidebar-width) + var(--content-width));
-  --anchor-offset: 40px;
+  --anchor-offset: 36px;
 }
 
 * {
@@ -141,7 +141,7 @@ main ul {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
   :root {
     --topbar-height: auto;
     --anchor-offset: 6px;
@@ -162,7 +162,7 @@ main ul {
     gap: 8px 12px;
   }
 
-    .top-nav a {
+  .top-nav a {
     text-align: center;
   }
 
