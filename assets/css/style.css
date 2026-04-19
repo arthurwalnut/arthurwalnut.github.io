@@ -27,7 +27,7 @@ html {
   scroll-behavior: smooth;
 }
 
-a,
+a:link,
 a:visited,
 a:hover {
   color: #0000ee;
@@ -87,6 +87,13 @@ a:active {
   color: #222;
   font-weight: 600;
   transition: color 180ms ease;
+}
+
+.top-nav a:link,
+.top-nav a:visited,
+.top-nav a:hover,
+.top-nav a:active {
+  color: #222;
 }
 
 .top-nav a[aria-current="true"] {
@@ -236,6 +243,8 @@ a:active {
 .contact-icon {
   width: 18px;
   height: 18px;
+  max-width: 18px;
+  max-height: 18px;
   flex: 0 0 18px;
   object-fit: contain;
   display: block;
