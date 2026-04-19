@@ -116,20 +116,87 @@ html {
 }
 
 .profile-pic-wrap {
+  --profile-switch-right: 8px;
+  --profile-switch-bottom: 8px;
+  position: relative;
   width: 220px;
   height: 220px;
   margin: 0 auto;
-  border-radius: 50%;
-  overflow: hidden;
+  perspective: 900px;
+}
+
+.profile-disc {
+  position: relative;
+  width: 100%;
+  height: 100%;
   border: 2px solid #e2e2e2;
+  border-radius: 50%;
   background: #f3f3f3;
+  box-shadow: 0 16px 36px rgba(27, 27, 27, 0.08);
+  transform-style: preserve-3d;
+  transition: transform 760ms cubic-bezier(0.2, 0.72, 0.18, 1);
+}
+
+.profile-disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 14px 0 24px rgba(255, 255, 255, 0.2), inset -18px 0 28px rgba(27, 27, 27, 0.12);
+  transform: translateZ(1px);
+  pointer-events: none;
+}
+
+.profile-pic-wrap.is-showing-secondary .profile-disc {
+  transform: rotateY(180deg);
 }
 
 .profile-pic {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
   display: block;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.profile-pic-back {
+  transform: rotateY(180deg);
+}
+
+.profile-switch {
+  position: absolute;
+  right: var(--profile-switch-right);
+  bottom: var(--profile-switch-bottom);
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  border: 1px solid rgba(27, 27, 27, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.profile-switch:hover {
+  transform: translateY(-1px);
+  background: #fff;
+}
+
+.profile-switch:focus-visible {
+  outline: 2px solid #1b1b1b;
+  outline-offset: 3px;
+}
+
+.profile-switch img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
 }
 
 .profile-name {

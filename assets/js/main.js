@@ -140,3 +140,52 @@
 
   updateIndicator();
 })();
+
+(() => {
+  const wrapper = document.querySelector(".profile-pic-wrap");
+  const images = wrapper ? Array.from(wrapper.querySelectorAll(".profile-pic")) : [];
+  const button = wrapper ? wrapper.querySelector(".profile-switch") : null;
+
+  if (!wrapper || images.length === 0 || !button) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let showingSecondary = false;
+  let isFlipping = false;
+
+  images.forEach((image) => {
+    if (image.currentSrc || image.src) {
+      const preload = new Image();
+      preload.src = image.currentSrc || image.src;
+    }
+  });
+
+  function setSide(nextShowingSecondary) {
+    showingSecondary = nextShowingSecondary;
+    wrapper.classList.toggle("is-showing-secondary", showingSecondary);
+    button.setAttribute("aria-pressed", String(showingSecondary));
+  }
+
+  button.addEventListener("click", () => {
+    if (isFlipping) {
+      return;
+    }
+
+    const nextShowingSecondary = !showingSecondary;
+
+    if (prefersReducedMotion.matches) {
+      setSide(nextShowingSecondary);
+      return;
+    }
+
+    isFlipping = true;
+    button.disabled = true;
+    setSide(nextShowingSecondary);
+
+    window.setTimeout(() => {
+      button.disabled = false;
+      isFlipping = false;
+    }, 760);
+  });
+})();
