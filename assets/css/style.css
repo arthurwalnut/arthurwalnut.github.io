@@ -27,6 +27,16 @@ html {
   scroll-behavior: smooth;
 }
 
+a,
+a:visited,
+a:hover {
+  color: #0000ee;
+}
+
+a:active {
+  color: #ff0000;
+}
+
 .top-nav-bar {
   position: fixed;
   top: 0;
@@ -212,7 +222,23 @@ html {
 
 .contact-block ul {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.contact-block li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+}
+
+.contact-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  object-fit: contain;
+  display: block;
 }
 
 .container {
