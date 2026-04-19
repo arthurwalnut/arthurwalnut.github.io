@@ -1,0 +1,142 @@
+(() => {
+  const nav = document.querySelector(".top-nav");
+  if (!nav) {
+    return;
+  }
+
+  const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+  const indicator = nav.querySelector(".nav-indicator");
+  const sections = links
+    .map((link) => document.getElementById(link.getAttribute("href").slice(1)))
+    .filter(Boolean);
+
+  if (!indicator || links.length === 0 || sections.length === 0) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let ticking = false;
+
+  const lerp = (start, end, amount) => start + (end - start) * amount;
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getTopOffset() {
+    const topbar = document.querySelector(".top-nav-bar");
+    const topbarHeight = topbar ? topbar.getBoundingClientRect().height : 0;
+    return topbarHeight + 12;
+  }
+
+  function getMaxScroll() {
+    return Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+  }
+
+  function getTargetTop(section) {
+    const rawTop = section.getBoundingClientRect().top + window.scrollY - getTopOffset();
+    return clamp(rawTop, 0, getMaxScroll());
+  }
+
+  function getMetric(index) {
+    const link = links[index];
+    const navRect = nav.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const sidePadding = 8;
+    const width = linkRect.width + sidePadding * 2;
+    const x = linkRect.left - navRect.left - sidePadding;
+    const y = linkRect.bottom - navRect.top - 4;
+
+    return { x, y, width };
+  }
+
+  function getSectionProgress() {
+    const scrollPosition = window.scrollY;
+    const tops = sections.map(getTargetTop);
+    const lastIndex = tops.length - 1;
+
+    if (scrollPosition <= tops[0] || getMaxScroll() === 0) {
+      return 0;
+    }
+
+    if (scrollPosition >= getMaxScroll() - 1) {
+      return lastIndex;
+    }
+
+    for (let index = 0; index < lastIndex; index += 1) {
+      const start = tops[index];
+      const end = tops[index + 1];
+
+      if (scrollPosition >= start && scrollPosition < end) {
+        const distance = Math.max(end - start, 1);
+        return index + (scrollPosition - start) / distance;
+      }
+    }
+
+    return lastIndex;
+  }
+
+  function setCurrentLink(activeIndex) {
+    links.forEach((link, index) => {
+      if (index === activeIndex) {
+        link.setAttribute("aria-current", "true");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  function updateIndicator() {
+    ticking = false;
+
+    const progress = getSectionProgress();
+    const lowerIndex = Math.floor(progress);
+    const upperIndex = Math.min(lowerIndex + 1, links.length - 1);
+    const amount = progress - lowerIndex;
+    const lowerMetric = getMetric(lowerIndex);
+    const upperMetric = getMetric(upperIndex);
+
+    const x = lerp(lowerMetric.x, upperMetric.x, amount);
+    const y = lerp(lowerMetric.y, upperMetric.y, amount);
+    const width = lerp(lowerMetric.width, upperMetric.width, amount);
+
+    nav.style.setProperty("--indicator-x", `${x}px`);
+    nav.style.setProperty("--indicator-y", `${y}px`);
+    nav.style.setProperty("--indicator-width", `${width}px`);
+    nav.classList.add("is-indicator-ready");
+    setCurrentLink(Math.round(progress));
+  }
+
+  function requestIndicatorUpdate() {
+    if (!ticking) {
+      ticking = true;
+      window.requestAnimationFrame(updateIndicator);
+    }
+  }
+
+  links.forEach((link, index) => {
+    link.addEventListener("click", (event) => {
+      const target = sections[index];
+      if (!target) {
+        return;
+      }
+
+      event.preventDefault();
+      window.scrollTo({
+        top: getTargetTop(target),
+        behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+      });
+      history.pushState(null, "", link.getAttribute("href"));
+    });
+  });
+
+  window.addEventListener("scroll", requestIndicatorUpdate, { passive: true });
+  window.addEventListener("resize", requestIndicatorUpdate);
+  window.addEventListener("load", updateIndicator);
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateIndicator);
+  }
+
+  updateIndicator();
+})();
