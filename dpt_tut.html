@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="stylesheet" href="./assets/css/style.css?v=20260423-dpt-layout" />
   <style>
     * {
       box-sizing: border-box;
@@ -30,13 +30,13 @@
     }
 
     .download-container {
-      max-width: 920px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 44px 28px 64px;
     }
 
     .download-intro {
-      margin-bottom: 36px;
+      margin-bottom: 34px;
       text-align: center;
     }
 
@@ -47,9 +47,111 @@
     }
 
     .download-intro p {
-      max-width: 680px;
+      max-width: 760px;
       margin: 0 auto 8px;
       color: #444;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .download-column {
+      min-width: 0;
+      padding: 24px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    .download-column h2 {
+      margin: 0 0 18px;
+      font-size: 1.25rem;
+      line-height: 1.25;
+    }
+
+    .tutorial-tabs {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 22px;
+      padding: 4px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      width: 196px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .tutorial-tab-indicator {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc((100% - 8px) / 2);
+      height: calc(100% - 8px);
+      border-radius: 6px;
+      background: #1b1b1b;
+      transition: transform 220ms ease;
+      pointer-events: none;
+    }
+
+    .tutorial-tab {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #444;
+      font: inherit;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .tutorial-tab[aria-selected="true"] {
+      color: #fff;
+    }
+
+    .tutorial-panel {
+      display: none;
+    }
+
+    .tutorial-panel.is-active {
+      display: block;
+    }
+
+    .tutorial-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .tutorial-card {
+      padding: 18px 18px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .tutorial-card h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .tutorial-note {
+      margin: 0;
+      color: #666;
+      font-size: 0.95rem;
     }
 
     .download-section {
@@ -58,7 +160,13 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .download-section h2 {
+    .download-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .download-section h3 {
       margin: 0 0 12px;
       font-size: 1rem;
       line-height: 1.4;
@@ -78,48 +186,286 @@
       color: #174ea6;
       font-weight: 500;
     }
+
+    @media (max-width: 920px) {
+      .download-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .download-container {
+        padding: 32px 16px 42px;
+      }
+
+      .download-column {
+        padding: 18px;
+      }
+
+      .tutorial-tabs {
+        width: min(196px, 100%);
+      }
+
+      .tutorial-tab {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .tutorial-list {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body class="download-page">
-
   <main class="download-container">
     <section class="download-intro">
       <h1>Discrete Probability Theory Tutorial Courseware</h1>
-      <p>Weekly handouts and slides written by Xujie Zhao (<a href="index.html">Homepage</a>).</p>
+      <p>Weekly handouts and slides written by <a href="index.html">Xujie Zhao</a>.</p>
       <p>Cheatsheet and old courseware from previous years.</p>
     </section>
 
-    <section class="download-section">
-      <h2>Tutorial 00</h2>
-      <ul class="file-list">
-        <li><a href="files/dpt_tut_26/00/Slides00.pdf" download>Slides 00.pdf</a></li>
-        <li><a href="files/dpt_tut_26/00/Handout00.pdf" download>Handout 00.pdf</a></li>
-      </ul>
-    </section>
+    <section class="download-grid">
+      <div class="download-column">
+        <h2>Tutorials</h2>
+        <div class="tutorial-tabs" role="tablist" aria-label="Tutorial semester switch">
+          <span class="tutorial-tab-indicator" aria-hidden="true"></span>
+          <button class="tutorial-tab" type="button" role="tab" aria-selected="false" aria-controls="tutorial-25ss" data-target="tutorial-25ss">25SS</button>
+          <button class="tutorial-tab" type="button" role="tab" aria-selected="true" aria-controls="tutorial-26ss" data-target="tutorial-26ss">26SS</button>
+        </div>
 
-    <section class="download-section">
-      <h2>Cheatsheet (written in Chinese and German)</h2>
-      <ul class="file-list">
-        <li><a href="files/dpt_tut/Cheatsheet (CHN + DEU)/Cheatsheet 00.jpg" download>Cheatsheet 00.jpg</a></li>
-        <li><a href="files/dpt_tut/Cheatsheet (CHN + DEU)/Cheatsheet 01.jpg" download>Cheatsheet 01.jpg</a></li>
-      </ul>
-    </section>
+        <section id="tutorial-25ss" class="tutorial-panel" role="tabpanel" hidden>
+          <div class="tutorial-list">
+            <article class="tutorial-card">
+              <h3>Week 00</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/00/Slides00.pdf" download>Slides00.pdf</a></li>
+                <li><a href="files/dpt_tut_25/00/dpt_sol_0.pdf" download>Solution00.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 01</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/01/Slides01.pdf" download>Slides01.pdf</a></li>
+                <li><a href="files/dpt_tut_25/01/dpt_sol_1.pdf" download>Solution01.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 02</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/02/Slides02.pdf" download>Slides02.pdf</a></li>
+                <li><a href="files/dpt_tut_25/02/dpt_sol_2.pdf" download>Solution02.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 03</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/03/Slides03.pdf" download>Slides03.pdf</a></li>
+                <li><a href="files/dpt_tut_25/03/dpt_sol_3.pdf" download>Solution03.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 04</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/04/Slides04.pdf" download>Slides04.pdf</a></li>
+                <li><a href="files/dpt_tut_25/04/dpt_sol_4.pdf" download>Solution04.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 05</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/05/Slides05.pdf" download>Slides05.pdf</a></li>
+                <li><a href="files/dpt_tut_25/05/dpt_sol_5.pdf" download>Solution05.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 06</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/06/Slides06.pdf" download>Slides06.pdf</a></li>
+                <li><a href="files/dpt_tut_25/06/dpt_sol_6.pdf" download>Solution06.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 07</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/07/Slides07.pdf" download>Slides07.pdf</a></li>
+                <li><a href="files/dpt_tut_25/07/dpt_sol_7.pdf" download>Solution07.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 08</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/08/Slides08.pdf" download>Slides08.pdf</a></li>
+                <li><a href="files/dpt_tut_25/08/dpt_sol_8.pdf" download>Solution08.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 09</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/09/Slides09.pdf" download>Slides09.pdf</a></li>
+                <li><a href="files/dpt_tut_25/09/dpt_sol_9.pdf" download>Solution09.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 10</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/10/Slides10.pdf" download>Slides10.pdf</a></li>
+                <li><a href="files/dpt_tut_25/10/dpt_sol_10.pdf" download>Solution10.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 11</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/11/Slides11.pdf" download>Slides11.pdf</a></li>
+                <li><a href="files/dpt_tut_25/11/dpt_sol_11.pdf" download>Solution11.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 12</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_25/12/Slides12.pdf" download>Slides12.pdf</a></li>
+                <li><a href="files/dpt_tut_25/12/dpt_sol_12.pdf" download>Solution12.pdf</a></li>
+              </ul>
+            </article>
+          </div>
+        </section>
 
-    <section class="download-section">
-      <h2>Old Courseware</h2>
-      <ul class="file-list">
-        <li><a href="files/dpt_tut/Old Courseware/2024-dwt (By Prof. Dr. Susanne Albers).pdf" download>2024-dwt (By Prof. Dr. Susanne Albers).pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/2024-ergaenzung.pdf" download>2024-ergaenzung.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2025.pdf" download>exam-2025.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2025-solution.pdf" download>exam-2025-solution.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2023.pdf" download>exam-2023.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2023-solution.pdf" download>exam-2023-solution.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2020.pdf" download>exam-2020.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2020-solution.pdf" download>exam-2020-solution.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2016.pdf" download>exam-2016.pdf</a></li>
-        <li><a href="files/dpt_tut/Old Courseware/exam-2016-solution.pdf" download>exam-2016-solution.pdf</a></li>
-      </ul>
+        <section id="tutorial-26ss" class="tutorial-panel is-active" role="tabpanel">
+          <div class="tutorial-list">
+            <article class="tutorial-card">
+              <h3>Week 00</h3>
+              <ul class="file-list">
+                <li><a href="files/dpt_tut_26/00/Slides00.pdf" download>Slides00.pdf</a></li>
+                <li><a href="files/dpt_tut_26/00/Handout00.pdf" download>Handout00.pdf</a></li>
+              </ul>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 01</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 02</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 03</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 04</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 05</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 06</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 07</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 08</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 09</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 10</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 11</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+            <article class="tutorial-card">
+              <h3>Week 12</h3>
+              <p class="tutorial-note">Coming soon...</p>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <div class="download-column">
+        <section class="download-section">
+          <h3>Old Courseware</h3>
+          <ul class="file-list">
+            <li><a href="files/dpt_tut/Old Courseware/2024-dwt (By Prof. Dr. Susanne Albers).pdf" download>2024-dwt (By Prof. Dr. Susanne Albers).pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/2024-ergaenzung.pdf" download>2024-ergaenzung.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2025.pdf" download>exam-2025.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2025-solution.pdf" download>exam-2025-solution.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2023.pdf" download>exam-2023.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2023-solution.pdf" download>exam-2023-solution.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2020.pdf" download>exam-2020.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2020-solution.pdf" download>exam-2020-solution.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2016.pdf" download>exam-2016.pdf</a></li>
+            <li><a href="files/dpt_tut/Old Courseware/exam-2016-solution.pdf" download>exam-2016-solution.pdf</a></li>
+          </ul>
+        </section>
+
+        <section class="download-section">
+          <h3>Cheatsheet (written in Chinese and German)</h3>
+          <ul class="file-list">
+            <li><a href="files/dpt_tut/Cheatsheet (CHN + DEU)/Cheatsheet 00.jpg" download>Cheatsheet 00.jpg</a></li>
+            <li><a href="files/dpt_tut/Cheatsheet (CHN + DEU)/Cheatsheet 01.jpg" download>Cheatsheet 01.jpg</a></li>
+          </ul>
+        </section>
+      </div>
     </section>
   </main>
+
+  <script>
+    (() => {
+      const tabs = Array.from(document.querySelectorAll(".tutorial-tab"));
+      const panels = Array.from(document.querySelectorAll(".tutorial-panel"));
+      const indicator = document.querySelector(".tutorial-tab-indicator");
+
+      function updateIndicator(activeTab) {
+        if (!indicator || !activeTab) {
+          return;
+        }
+
+        const inset = 4;
+        indicator.style.width = `${activeTab.offsetWidth}px`;
+        indicator.style.transform = `translateX(${activeTab.offsetLeft - inset}px)`;
+      }
+
+      function activateTab(tab) {
+        const targetId = tab.dataset.target;
+
+        tabs.forEach((button) => {
+          const isSelected = button === tab;
+          button.setAttribute("aria-selected", String(isSelected));
+        });
+
+        panels.forEach((panel) => {
+          const isActive = panel.id === targetId;
+          panel.classList.toggle("is-active", isActive);
+          panel.hidden = !isActive;
+        });
+
+        updateIndicator(tab);
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          activateTab(tab);
+        });
+      });
+
+      window.addEventListener("load", () => {
+        activateTab(document.querySelector('.tutorial-tab[aria-selected="true"]') || tabs[0]);
+      });
+
+      window.addEventListener("resize", () => {
+        updateIndicator(document.querySelector('.tutorial-tab[aria-selected="true"]') || tabs[0]);
+      });
+    })();
+  </script>
 </body>
 </html>
