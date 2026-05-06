@@ -189,3 +189,57 @@
     }, 760);
   });
 })();
+
+(() => {
+  const switchers = Array.from(document.querySelectorAll("[data-lang-switch]"));
+
+  if (switchers.length === 0) {
+    return;
+  }
+
+  function closeAll(except = null) {
+    switchers.forEach((switcher) => {
+      if (switcher === except) {
+        return;
+      }
+
+      switcher.classList.remove("is-open");
+      const trigger = switcher.querySelector(".lang-switch-trigger");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  switchers.forEach((switcher) => {
+    const trigger = switcher.querySelector(".lang-switch-trigger");
+
+    if (!trigger) {
+      return;
+    }
+
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      const willOpen = !switcher.classList.contains("is-open");
+      closeAll();
+      switcher.classList.toggle("is-open", willOpen);
+      trigger.setAttribute("aria-expanded", String(willOpen));
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (switchers.some((switcher) => switcher.contains(event.target))) {
+      return;
+    }
+
+    closeAll();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") {
+      return;
+    }
+
+    closeAll();
+  });
+})();
