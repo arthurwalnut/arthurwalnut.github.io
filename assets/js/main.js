@@ -54,6 +54,18 @@
     const scrollPosition = window.scrollY;
     const tops = sections.map(getTargetTop);
     const lastIndex = tops.length - 1;
+    const currentHash = window.location.hash.slice(1);
+    const hashIndex = links.findIndex((link) => link.getAttribute("href").slice(1) === currentHash);
+    const nearbyIndices = tops.reduce((indices, top, index) => {
+      if (Math.abs(top - scrollPosition) <= 2) {
+        indices.push(index);
+      }
+      return indices;
+    }, []);
+
+    if (nearbyIndices.length > 1 && nearbyIndices.includes(hashIndex)) {
+      return hashIndex;
+    }
 
     if (scrollPosition <= tops[0] || getMaxScroll() === 0) {
       return 0;
@@ -122,16 +134,19 @@
       }
 
       event.preventDefault();
+      history.pushState(null, "", link.getAttribute("href"));
+      updateIndicator();
       window.scrollTo({
         top: getTargetTop(target),
         behavior: prefersReducedMotion.matches ? "auto" : "smooth",
       });
-      history.pushState(null, "", link.getAttribute("href"));
     });
   });
 
   window.addEventListener("scroll", requestIndicatorUpdate, { passive: true });
   window.addEventListener("resize", requestIndicatorUpdate);
+  window.addEventListener("hashchange", requestIndicatorUpdate);
+  window.addEventListener("popstate", requestIndicatorUpdate);
   window.addEventListener("load", updateIndicator);
 
   if (document.fonts && document.fonts.ready) {
