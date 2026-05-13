@@ -413,6 +413,35 @@ main ul {
   margin-bottom: 8px;
 }
 
+.item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.item-header strong {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.item-time {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.work-item-empty {
+  min-height: 82px;
+  color: transparent;
+  user-select: none;
+}
+
+.work-item-empty::marker {
+  color: transparent;
+}
+
 @media (max-width: 900px) {
   :root {
     --sidebar-width: 240px;
@@ -429,6 +458,15 @@ main ul {
 
   .container {
     padding: 24px;
+  }
+
+  .item-header {
+    flex-wrap: wrap;
+  }
+
+  .item-time {
+    width: 100%;
+    white-space: normal;
   }
 }
 
