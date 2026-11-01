@@ -149,11 +149,116 @@
   window.addEventListener("popstate", requestIndicatorUpdate);
   window.addEventListener("load", updateIndicator);
 
+  const main = document.querySelector("main");
+  if (main) {
+    new ResizeObserver(requestIndicatorUpdate).observe(main);
+  }
+
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(updateIndicator);
   }
 
   updateIndicator();
+})();
+
+(() => {
+  const section = document.querySelector("#pubs[data-year-label]");
+  const list = section ? section.querySelector("ul") : null;
+  if (!list) {
+    return;
+  }
+
+  const items = Array.from(list.querySelectorAll(".publication-item"));
+  if (!items.length || items.some((item) => !/^\d{4}$/.test(item.dataset.year || ""))) {
+    return;
+  }
+
+  // Years come from the HTML entries; adding a year needs no tab or script edits.
+  const years = [...new Set(items.map((item) => item.dataset.year))].sort((a, b) => b - a);
+  const tabs = document.createElement("div");
+  tabs.className = "publication-years";
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", section.dataset.yearLabel);
+  const indicator = document.createElement("span");
+  indicator.className = "publication-year-indicator";
+  indicator.setAttribute("aria-hidden", "true");
+  const viewport = document.createElement("div");
+  viewport.className = "publication-viewport";
+  const track = document.createElement("div");
+  track.className = "publication-track";
+  const buttons = [];
+  const panels = [];
+  let activeIndex = 0;
+
+  years.forEach((year, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "publication-year";
+    button.id = `publication-year-${year}`;
+    button.textContent = year;
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-controls", `publications-${year}`);
+    button.addEventListener("click", () => selectYear(index));
+    button.addEventListener("keydown", (event) => {
+      let nextIndex;
+      if (event.key === "ArrowRight") nextIndex = (index + 1) % years.length;
+      if (event.key === "ArrowLeft") nextIndex = (index - 1 + years.length) % years.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = years.length - 1;
+      if (nextIndex === undefined) return;
+      event.preventDefault();
+      buttons[nextIndex].focus({ preventScroll: true });
+      selectYear(nextIndex);
+    });
+
+    const panel = document.createElement("div");
+    panel.className = "publication-panel";
+    panel.id = `publications-${year}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", button.id);
+    const yearList = document.createElement("ul");
+    items.filter((item) => item.dataset.year === year).forEach((item) => yearList.append(item));
+    panel.append(yearList);
+    tabs.append(button);
+    track.append(panel);
+    buttons.push(button);
+    panels.push(panel);
+  });
+
+  tabs.append(indicator);
+  viewport.append(track);
+  list.replaceWith(tabs, viewport);
+
+  function updateLayout() {
+    const button = buttons[activeIndex];
+    indicator.style.width = `${button.offsetWidth}px`;
+    indicator.style.transform = `translateX(${button.offsetLeft}px)`;
+    track.style.transform = `translateX(${-activeIndex * 100}%)`;
+    viewport.style.height = `${panels[activeIndex].offsetHeight}px`;
+  }
+
+  function selectYear(index) {
+    activeIndex = index;
+    buttons.forEach((button, buttonIndex) => {
+      const selected = buttonIndex === index;
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      panels[buttonIndex].inert = !selected;
+      panels[buttonIndex].setAttribute("aria-hidden", String(!selected));
+    });
+    updateLayout();
+    const button = buttons[index];
+    if (button.offsetLeft < tabs.scrollLeft) {
+      tabs.scrollLeft = button.offsetLeft;
+    } else if (button.offsetLeft + button.offsetWidth > tabs.scrollLeft + tabs.clientWidth) {
+      tabs.scrollLeft = button.offsetLeft + button.offsetWidth - tabs.clientWidth;
+    }
+  }
+
+  selectYear(0);
+  const resizeObserver = new ResizeObserver(updateLayout);
+  panels.forEach((panel) => resizeObserver.observe(panel));
+  resizeObserver.observe(tabs);
 })();
 
 (() => {

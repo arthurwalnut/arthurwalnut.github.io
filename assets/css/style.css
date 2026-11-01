@@ -388,6 +388,77 @@ main ul {
   margin-bottom: 8px;
 }
 
+.publication-years {
+  position: relative;
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.publication-year {
+  flex: 0 0 auto;
+  padding: 8px 8px 14px;
+  border: 0;
+  background: transparent;
+  color: #555;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.publication-year:hover,
+.publication-year[aria-selected="true"] {
+  color: #000;
+}
+
+.publication-year:focus-visible {
+  outline: 2px solid #1b1b1b;
+  outline-offset: -3px;
+  border-radius: 4px;
+}
+
+.publication-year-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #1b1b1b;
+  pointer-events: none;
+  transition: transform 360ms ease, width 360ms ease;
+}
+
+.publication-viewport {
+  overflow: hidden;
+  transition: height 360ms ease;
+}
+
+.publication-track {
+  display: flex;
+  align-items: flex-start;
+  transition: transform 360ms ease;
+}
+
+.publication-panel {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.publication-panel ul {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publication-year-indicator,
+  .publication-viewport,
+  .publication-track {
+    transition: none;
+  }
+}
+
 .publication-title {
   font-size: 1.12rem;
   font-weight: 600;
