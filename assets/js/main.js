@@ -15,6 +15,10 @@
   }
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mobileLayout = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)");
+  const topbar = nav.closest(".top-nav-bar");
+  let previousScrollY = window.scrollY;
+  let scrollTravel = 0;
   let ticking = false;
 
   const lerp = (start, end, amount) => start + (end - start) * amount;
@@ -31,6 +35,35 @@
 
   function getMaxScroll() {
     return Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+  }
+
+  function resetTopbar() {
+    topbar?.classList.remove("is-scroll-hidden");
+    previousScrollY = clamp(window.scrollY, 0, getMaxScroll());
+    scrollTravel = 0;
+    requestIndicatorUpdate();
+  }
+
+  function updateTopbar() {
+    if (!topbar) return;
+
+    // Clamp overscroll so bouncing at either page edge does not reverse direction.
+    const scrollY = clamp(window.scrollY, 0, getMaxScroll());
+    const delta = scrollY - previousScrollY;
+    previousScrollY = scrollY;
+
+    if (!mobileLayout.matches || scrollY === 0 || topbar.querySelector(".is-open, :focus-visible")) {
+      topbar.classList.remove("is-scroll-hidden");
+      scrollTravel = 0;
+      return;
+    }
+
+    if (delta === 0) return;
+    scrollTravel = Math.sign(delta) === Math.sign(scrollTravel) ? scrollTravel + delta : delta;
+    if (Math.abs(scrollTravel) >= 8) {
+      topbar.classList.toggle("is-scroll-hidden", scrollTravel > 0);
+      scrollTravel = 0;
+    }
   }
 
   function getTargetTop(section) {
@@ -100,6 +133,7 @@
 
   function updateIndicator() {
     ticking = false;
+    updateTopbar();
 
     const progress = getSectionProgress();
     const lowerIndex = Math.floor(progress);
@@ -145,6 +179,8 @@
 
   window.addEventListener("scroll", requestIndicatorUpdate, { passive: true });
   window.addEventListener("resize", requestIndicatorUpdate);
+  mobileLayout.addEventListener("change", resetTopbar);
+  topbar?.addEventListener("focusin", resetTopbar);
   window.addEventListener("hashchange", requestIndicatorUpdate);
   window.addEventListener("popstate", requestIndicatorUpdate);
   window.addEventListener("load", updateIndicator);

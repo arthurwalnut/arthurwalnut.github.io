@@ -51,6 +51,7 @@ a:active {
   background: transparent;
   isolation: isolate;
   z-index: 1000;
+  transition: transform 180ms ease;
 }
 
 .top-nav-bar::before,
@@ -452,6 +453,7 @@ main ul {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .top-nav-bar,
   .publication-year-indicator,
   .publication-viewport,
   .publication-track {
@@ -556,6 +558,10 @@ main ul {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
+  }
+
+  .top-nav-bar.is-scroll-hidden {
+    transform: translateY(-100%);
   }
 
   .top-nav {
