@@ -19,6 +19,7 @@
   const topbar = nav.closest(".top-nav-bar");
   let previousScrollY = window.scrollY;
   let scrollTravel = 0;
+  let keepTopbarVisible = false;
   let ticking = false;
 
   const lerp = (start, end, amount) => start + (end - start) * amount;
@@ -44,6 +45,13 @@
     requestIndicatorUpdate();
   }
 
+  function resumeTopbarScroll() {
+    if (keepTopbarVisible) {
+      keepTopbarVisible = false;
+      resetTopbar();
+    }
+  }
+
   function updateTopbar() {
     if (!topbar) return;
 
@@ -52,7 +60,7 @@
     const delta = scrollY - previousScrollY;
     previousScrollY = scrollY;
 
-    if (!mobileLayout.matches || scrollY === 0 || topbar.querySelector(".is-open, :focus-visible")) {
+    if (keepTopbarVisible || !mobileLayout.matches || scrollY === 0 || topbar.querySelector(".is-open, :focus-visible")) {
       topbar.classList.remove("is-scroll-hidden");
       scrollTravel = 0;
       return;
@@ -79,8 +87,9 @@
     const width = linkRect.width + sidePadding * 2;
     const x = linkRect.left - navRect.left - sidePadding;
     const y = linkRect.bottom - navRect.top - 4;
+    const centerY = linkRect.top - navRect.top + linkRect.height / 2;
 
-    return { x, y, width };
+    return { x, y, width, centerY };
   }
 
   function getSectionProgress() {
@@ -141,14 +150,20 @@
     const amount = progress - lowerIndex;
     const lowerMetric = getMetric(lowerIndex);
     const upperMetric = getMetric(upperIndex);
+    const crossesRow = Math.abs(lowerMetric.centerY - upperMetric.centerY) > 1;
 
-    const x = lerp(lowerMetric.x, upperMetric.x, amount);
-    const y = lerp(lowerMetric.y, upperMetric.y, amount);
-    const width = lerp(lowerMetric.width, upperMetric.width, amount);
+    // Across rows, hand off two line segments instead of moving through the labels.
+    const x = crossesRow ? lowerMetric.x + lowerMetric.width * amount : lerp(lowerMetric.x, upperMetric.x, amount);
+    const y = crossesRow ? lowerMetric.y : lerp(lowerMetric.y, upperMetric.y, amount);
+    const width = crossesRow ? lowerMetric.width * (1 - amount) : lerp(lowerMetric.width, upperMetric.width, amount);
 
     nav.style.setProperty("--indicator-x", `${x}px`);
     nav.style.setProperty("--indicator-y", `${y}px`);
     nav.style.setProperty("--indicator-width", `${width}px`);
+    nav.style.setProperty("--indicator-next-x", `${upperMetric.x}px`);
+    nav.style.setProperty("--indicator-next-y", `${upperMetric.y}px`);
+    nav.style.setProperty("--indicator-next-width", `${crossesRow ? upperMetric.width * amount : 0}px`);
+    nav.classList.toggle("is-multiline", Math.abs(getMetric(0).centerY - getMetric(links.length - 1).centerY) > 1);
     nav.classList.add("is-indicator-ready");
     setCurrentLink(Math.round(progress));
   }
@@ -168,6 +183,9 @@
       }
 
       event.preventDefault();
+      // Keep click-driven scrolling visible until the next manual scroll input.
+      keepTopbarVisible = true;
+      resetTopbar();
       history.pushState(null, "", link.getAttribute("href"));
       updateIndicator();
       window.scrollTo({
@@ -178,6 +196,15 @@
   });
 
   window.addEventListener("scroll", requestIndicatorUpdate, { passive: true });
+  window.addEventListener("touchmove", resumeTopbarScroll, { passive: true });
+  window.addEventListener("wheel", (event) => {
+    if (event.deltaY !== 0 && !event.ctrlKey) resumeTopbarScroll();
+  }, { passive: true });
+  window.addEventListener("keydown", (event) => {
+    if (!event.defaultPrevented && ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+      resumeTopbarScroll();
+    }
+  });
   window.addEventListener("resize", requestIndicatorUpdate);
   mobileLayout.addEventListener("change", resetTopbar);
   topbar?.addEventListener("focusin", resetTopbar);

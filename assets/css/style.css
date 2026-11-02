@@ -224,7 +224,8 @@ a:active {
   color: #000;
 }
 
-.nav-indicator {
+.nav-indicator,
+.top-nav::after {
   position: absolute;
   top: 0;
   left: 0;
@@ -238,7 +239,21 @@ a:active {
   pointer-events: none;
 }
 
-.top-nav.is-indicator-ready .nav-indicator {
+.top-nav::after {
+  content: "";
+  --indicator-x: var(--indicator-next-x, 0px);
+  --indicator-y: var(--indicator-next-y, 0px);
+  --indicator-width: var(--indicator-next-width, 0px);
+}
+
+.top-nav.is-multiline .nav-indicator,
+.top-nav.is-multiline::after {
+  /* Scroll frames drive both segments directly, including row handoffs. */
+  transition: opacity 120ms ease-out;
+}
+
+.top-nav.is-indicator-ready .nav-indicator,
+.top-nav.is-indicator-ready::after {
   opacity: 1;
 }
 
