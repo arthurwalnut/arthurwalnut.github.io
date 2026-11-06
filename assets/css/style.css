@@ -40,13 +40,17 @@ a:active {
 .top-nav-bar {
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(var(--layout-width), calc(100vw - 32px));
+  inset-inline: 0;
+  margin-inline: auto;
+  width: max-content;
+  min-width: min(var(--layout-width), calc(100% - 32px));
+  max-width: calc(100% - 32px);
   height: var(--topbar-height);
   display: flex;
   align-items: center;
-  padding: 0 88px;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 28px);
+  padding-inline: clamp(12px, 2vw, 24px);
   border-bottom: 1px solid #ddd;
   background: transparent;
   isolation: isolate;
@@ -68,25 +72,41 @@ a:active {
 }
 
 .top-nav {
+  flex: 0 1 auto;
+  min-width: 0;
+  width: max-content;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-padding-inline: 24px;
+  mask-image: linear-gradient(to right, transparent, black var(--fade-left, 0px),
+    black calc(100% - var(--fade-right, 0px)), transparent);
+}
+
+.top-nav::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-track {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  gap: 60px;
-  flex-wrap: wrap;
+  width: max-content;
+  gap: clamp(18px, 3vw, 48px);
+  padding-inline: 8px;
+  overflow: clip;
   --indicator-x: 0px;
   --indicator-y: 0px;
   --indicator-width: 36px;
 }
 
 .lang-switch {
-  position: absolute;
-  top: 50%;
-  right: 20px;
+  position: relative;
+  flex: none;
   z-index: 2;
-  width: 138px;
-  transform: translateY(-50%);
+  width: max-content;
+  min-width: 110px;
 }
 
 .lang-switch-trigger {
@@ -94,6 +114,7 @@ a:active {
   height: 40px;
   display: grid;
   grid-template-columns: 18px 1fr 18px;
+  column-gap: 6px;
   align-items: center;
   padding: 0 12px;
   border: 1px solid rgba(27, 27, 27, 0.12);
@@ -205,6 +226,8 @@ a:active {
 
 .top-nav a {
   position: relative;
+  flex: none;
+  white-space: nowrap;
   z-index: 1;
   padding: 8px 0 14px;
   text-decoration: none;
@@ -224,8 +247,7 @@ a:active {
   color: #000;
 }
 
-.nav-indicator,
-.top-nav::after {
+.nav-indicator {
   position: absolute;
   top: 0;
   left: 0;
@@ -239,22 +261,12 @@ a:active {
   pointer-events: none;
 }
 
-.top-nav::after {
-  content: "";
-  --indicator-x: var(--indicator-next-x, 0px);
-  --indicator-y: var(--indicator-next-y, 0px);
-  --indicator-width: var(--indicator-next-width, 0px);
-}
-
-.top-nav.is-multiline .nav-indicator,
-.top-nav.is-multiline::after {
-  /* Scroll frames drive both segments directly, including row handoffs. */
-  transition: opacity 120ms ease-out;
-}
-
-.top-nav.is-indicator-ready .nav-indicator,
-.top-nav.is-indicator-ready::after {
+.top-nav.is-indicator-ready .nav-indicator {
   opacity: 1;
+}
+
+.top-nav.is-overflowing .nav-indicator {
+  transition-property: opacity;
 }
 
 .sidebar {
@@ -265,7 +277,9 @@ a:active {
   height: calc(100vh - var(--topbar-height));
   padding: 28px 20px;
   border-right: 1px solid #ddd;
+  overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-width: none;
   background: transparent;
   isolation: isolate;
   z-index: 900;
@@ -275,8 +289,8 @@ a:active {
   --profile-switch-right: 8px;
   --profile-switch-bottom: 8px;
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
   margin: 0 auto;
   perspective: 900px;
 }
@@ -377,6 +391,7 @@ a:active {
   align-items: center;
   gap: 9px;
   margin-bottom: 6px;
+  overflow-wrap: anywhere;
 }
 
 .contact-icon {
@@ -534,18 +549,24 @@ main ul {
   color: transparent;
 }
 
+/* Below the full layout width plus its gutters, include the left gutter in the sidebar. */
+@media (max-width: 1232px), (hover: none) and (pointer: coarse) {
+  .sidebar {
+    left: 0;
+    width: calc(var(--sidebar-width) + 16px);
+    padding-inline: 12px;
+    text-align: center;
+  }
+
+  .contact-block li {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
     --sidebar-width: 240px;
     --content-width: 700px;
-  }
-
-  .top-nav-bar {
-    padding: 0 78px;
-  }
-
-  .top-nav {
-    gap: 28px;
   }
 
   .container {
@@ -574,36 +595,14 @@ main ul {
 
   .top-nav-bar {
     position: sticky;
-    left: 0;
-    transform: none;
     width: 100%;
+    max-width: 100%;
     min-height: 60px;
-    padding: 12px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
+    padding-block: 4px;
   }
 
   .top-nav-bar.is-scroll-hidden {
     transform: translateY(-100%);
-  }
-
-  .top-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px 12px;
-    width: 100%;
-  }
-
-  .top-nav a {
-    text-align: center;
-  }
-
-  .lang-switch {
-    position: static;
-    transform: none;
-    justify-self: end;
-    align-self: center;
   }
 
   .sidebar {
@@ -615,11 +614,6 @@ main ul {
     border-right: none;
     border-bottom: 1px solid #ddd;
     padding: 18px 16px;
-    text-align: center;
-  }
-
-  .contact-block li {
-    justify-content: center;
   }
 
   .container {

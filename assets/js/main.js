@@ -4,22 +4,27 @@
     return;
   }
 
-  const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+  const links = Array.from(nav.querySelectorAll('a[href^="#"]'))
+    .filter((link) => document.getElementById(link.hash.slice(1)));
+  const track = nav.querySelector(".nav-track");
   const indicator = nav.querySelector(".nav-indicator");
-  const sections = links
-    .map((link) => document.getElementById(link.getAttribute("href").slice(1)))
-    .filter(Boolean);
+  const sections = links.map((link) => document.getElementById(link.hash.slice(1)));
 
-  if (!indicator || links.length === 0 || sections.length === 0) {
+  if (!track || !indicator || links.length === 0) {
     return;
   }
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobileLayout = window.matchMedia("(max-width: 768px), (hover: none) and (pointer: coarse)");
   const topbar = nav.closest(".top-nav-bar");
+  const fadeWidth = 24;
   let previousScrollY = window.scrollY;
   let scrollTravel = 0;
   let keepTopbarVisible = false;
+  let previousProgress = null;
+  let previousTarget = 0;
+  let appliedLeft = 0;
+  let panAnchor = null;
   let ticking = false;
 
   const lerp = (start, end, amount) => start + (end - start) * amount;
@@ -81,15 +86,41 @@
 
   function getMetric(index) {
     const link = links[index];
-    const navRect = nav.getBoundingClientRect();
-    const linkRect = link.getBoundingClientRect();
     const sidePadding = 8;
-    const width = linkRect.width + sidePadding * 2;
-    const x = linkRect.left - navRect.left - sidePadding;
-    const y = linkRect.bottom - navRect.top - 4;
-    const centerY = linkRect.top - navRect.top + linkRect.height / 2;
+    return {
+      x: link.offsetLeft - sidePadding,
+      y: link.offsetTop + link.offsetHeight - 4,
+      width: link.offsetWidth + sidePadding * 2,
+    };
+  }
 
-    return { x, y, width, centerY };
+  function updateNavEdges() {
+    const remaining = nav.scrollWidth - nav.clientWidth - nav.scrollLeft;
+    nav.classList.toggle("is-overflowing", nav.scrollWidth > nav.clientWidth);
+    nav.style.setProperty("--fade-left", `${clamp(nav.scrollLeft, 0, fadeWidth)}px`);
+    nav.style.setProperty("--fade-right", `${clamp(remaining, 0, fadeWidth)}px`);
+  }
+
+  function followIndicator(progress, index, lower, upper) {
+    if (progress === previousProgress) return;
+    const maxLeft = nav.scrollWidth - nav.clientWidth;
+    const centered = (metric) => clamp(metric.x + (metric.width - nav.clientWidth) / 2, 0, maxLeft);
+    const target = lerp(centered(lower), centered(upper), progress - index);
+
+    // Blend a manual pan back into the scroll path over one section of travel.
+    if (previousProgress !== null && nav.scrollLeft !== appliedLeft) {
+      panAnchor = { progress: previousProgress, offset: nav.scrollLeft - previousTarget };
+    }
+    let left = target;
+    if (panAnchor) {
+      const weight = Math.max(0, 1 - Math.abs(progress - panAnchor.progress));
+      left += panAnchor.offset * weight;
+      if (weight === 0) panAnchor = null;
+    }
+    previousProgress = progress;
+    previousTarget = target;
+    nav.scrollLeft = left;
+    appliedLeft = nav.scrollLeft;
   }
 
   function getSectionProgress() {
@@ -150,22 +181,16 @@
     const amount = progress - lowerIndex;
     const lowerMetric = getMetric(lowerIndex);
     const upperMetric = getMetric(upperIndex);
-    const crossesRow = Math.abs(lowerMetric.centerY - upperMetric.centerY) > 1;
+    const x = lerp(lowerMetric.x, upperMetric.x, amount);
+    const width = lerp(lowerMetric.width, upperMetric.width, amount);
 
-    // Across rows, hand off two line segments instead of moving through the labels.
-    const x = crossesRow ? lowerMetric.x + lowerMetric.width * amount : lerp(lowerMetric.x, upperMetric.x, amount);
-    const y = crossesRow ? lowerMetric.y : lerp(lowerMetric.y, upperMetric.y, amount);
-    const width = crossesRow ? lowerMetric.width * (1 - amount) : lerp(lowerMetric.width, upperMetric.width, amount);
-
-    nav.style.setProperty("--indicator-x", `${x}px`);
-    nav.style.setProperty("--indicator-y", `${y}px`);
-    nav.style.setProperty("--indicator-width", `${width}px`);
-    nav.style.setProperty("--indicator-next-x", `${upperMetric.x}px`);
-    nav.style.setProperty("--indicator-next-y", `${upperMetric.y}px`);
-    nav.style.setProperty("--indicator-next-width", `${crossesRow ? upperMetric.width * amount : 0}px`);
-    nav.classList.toggle("is-multiline", Math.abs(getMetric(0).centerY - getMetric(links.length - 1).centerY) > 1);
+    track.style.setProperty("--indicator-x", `${x}px`);
+    track.style.setProperty("--indicator-y", `${lowerMetric.y}px`);
+    track.style.setProperty("--indicator-width", `${width}px`);
+    followIndicator(progress, lowerIndex, lowerMetric, upperMetric);
     nav.classList.add("is-indicator-ready");
     setCurrentLink(Math.round(progress));
+    updateNavEdges();
   }
 
   function requestIndicatorUpdate() {
@@ -196,7 +221,17 @@
   });
 
   window.addEventListener("scroll", requestIndicatorUpdate, { passive: true });
-  window.addEventListener("touchmove", resumeTopbarScroll, { passive: true });
+  let navTouchStart;
+  nav.addEventListener("touchstart", (event) => {
+    navTouchStart = event.touches[0];
+  }, { passive: true });
+  window.addEventListener("touchmove", (event) => {
+    if (navTouchStart && nav.contains(event.target)) {
+      const touch = event.touches[0];
+      if (Math.abs(touch.clientX - navTouchStart.clientX) > Math.abs(touch.clientY - navTouchStart.clientY)) return;
+    }
+    resumeTopbarScroll();
+  }, { passive: true });
   window.addEventListener("wheel", (event) => {
     if (event.deltaY !== 0 && !event.ctrlKey) resumeTopbarScroll();
   }, { passive: true });
@@ -211,6 +246,15 @@
   window.addEventListener("hashchange", requestIndicatorUpdate);
   window.addEventListener("popstate", requestIndicatorUpdate);
   window.addEventListener("load", updateIndicator);
+
+  nav.addEventListener("scroll", updateNavEdges, { passive: true });
+  const navResize = new ResizeObserver(() => {
+    previousProgress = null;
+    panAnchor = null;
+    requestIndicatorUpdate();
+  });
+  navResize.observe(nav);
+  navResize.observe(track);
 
   const main = document.querySelector("main");
   if (main) {
